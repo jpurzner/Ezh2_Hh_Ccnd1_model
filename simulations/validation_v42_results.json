@@ -1,0 +1,119 @@
+{
+  "model": "v42_mycn_hill",
+  "best_params": {
+    "n_MYCN_Cd": 3,
+    "k_Cd_tx_MYCN": 15.0,
+    "K_MYCN_Cd": 1.5,
+    "k_MYCN_synth_basal": 0.3,
+    "k_MYCN_synth_Gli": 0.102,
+    "k_Cd_tx_Gli_max": 4.0,
+    "MYCN_amplification_MB": 2.8
+  },
+  "tests_passed": 16,
+  "tests_total": 18,
+  "test_results": {
+    "WT divisions (72h)": {
+      "actual": 4,
+      "target": 3,
+      "pass": true
+    },
+    "WT period (~23h)": {
+      "actual": 22.23564954682779,
+      "target": 23.0,
+      "pass": 1.0
+    },
+    "G0 divisions (=0)": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "EZH2 G0/cycling ratio (~0.6)": {
+      "actual": 0.567273619099749,
+      "target": 0.6,
+      "pass": 1.0
+    },
+    "WT+GDC CycD1 ratio (0.14)": {
+      "actual": 0.13618689500865852,
+      "target": 0.14,
+      "pass": 1.0
+    },
+    "WT+GDC Gli1 reduction (>90%)": {
+      "actual": 1.0,
+      "target": 0.99,
+      "pass": 1.0
+    },
+    "WT+GDC MYCN ratio (0.78)": {
+      "actual": 0.7879169932970502,
+      "target": 0.78,
+      "pass": 1.0
+    },
+    "WT+GDC arrest (0 div)": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "EZH2i CycD1 fold change (~2x)": {
+      "actual": 2.0001397589783427,
+      "target": 2.0,
+      "pass": 1.0
+    },
+    "noSHH arrest (0 div)": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "MB divisions (72h)": {
+      "actual": 5,
+      "target": 3,
+      "pass": false
+    },
+    "MYCN MB/WT ratio (~2.8)": {
+      "actual": 2.42470808571125,
+      "target": 2.8,
+      "pass": 1.0
+    },
+    "MB+GDC CycD1 ratio (0.40)": {
+      "actual": 0.4148832173201639,
+      "target": 0.4,
+      "pass": 1.0
+    },
+    "MB+GDC MYCN ratio (0.86)": {
+      "actual": 0.9098693546792856,
+      "target": 0.86,
+      "pass": 1.0
+    },
+    "MB+GDC Gli1 reduction (77%)": {
+      "actual": 1.0,
+      "target": 0.77,
+      "pass": 0.0
+    },
+    "MB+GDC arrest (0 div)": {
+      "actual": 1,
+      "target": 0,
+      "pass": true
+    },
+    "MB+GDC+EZH2i rescue (>0 div)": {
+      "actual": 5,
+      "target": 3,
+      "pass": true
+    },
+    "EZH2 WT+GDC reduction (25-47%)": {
+      "actual": 0.35954813726503687,
+      "target": 0.36,
+      "pass": 1.0
+    }
+  },
+  "summary": {
+    "wt_divisions": 4,
+    "wt_period": 22.23564954682779,
+    "mb_divisions": 5,
+    "mb_gdc_divisions": 1,
+    "mb_combo_divisions": 5,
+    "wt_gdc_cd_ratio": 0.13618689500865852,
+    "mb_gdc_cd_ratio": 0.4148832173201639,
+    "mycn_wt_gdc_ratio": 0.7879169932970502,
+    "mycn_mb_gdc_ratio": 0.9098693546792856,
+    "ezh2_g0_cyc_ratio": 0.567273619099749,
+    "ezh2i_cd_fc": 2.0001397589783427
+  }
+}

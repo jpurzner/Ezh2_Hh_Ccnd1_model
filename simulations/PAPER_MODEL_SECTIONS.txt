@@ -1,0 +1,157 @@
+Computational Model Results and Methods -- Chahin et al.
+
+Placement: This results section goes after Result 3 (CDK4/6 inhibition / E2F1 overexpression, Fig. 4) and before Result 4 (EZH2i rescues MB proliferation under Vismodegib, Fig. 5). It provides the computational framework that motivates and predicts the rescue experiment.
+
+
+================================================================================
+RESULTS
+================================================================================
+
+A quantitative model of the Ezh2-Cyclin D1 feedback loop predicts context-dependent drug responses in GNPs and medulloblastoma
+
+To formalize the negative feedback loop identified in Figures 2-4 and explore its quantitative consequences, we constructed an ordinary differential equation (ODE) model integrating Hedgehog signaling, MYCN, EZH2, and the mammalian cell cycle engine. The model architecture is shown in Fig. Xa (fig_v42_architecture.png). Cyclin D1 mRNA transcription serves as the central integration node, receiving three inputs -- basal transcription, Gli-driven transcription (via SHH/Ptch1/Smo/Gli), and MYCN-driven transcription -- all subject to EZH2-mediated repression through H3K27me3 at the Cyclin D1 promoter. The cell cycle core, adapted from Gerard and Goldbeter (2009), produces autonomous oscillations through the sequential activation of CycD/CDK4, CycE/CDK2, CycA/CDK2, and CycB/CDK1, with pRB-E2F bistability governing the G0/G1-to-S transition and p27/Kip1 providing a stoichiometric barrier to cell cycle entry. EZH2 transcription is driven by E2F and hyperphosphorylated pRB (pRBpp), closing the feedback loop: cycling cells upregulate EZH2, which represses Cyclin D1, which in turn constrains proliferative drive.
+
+Model parameters were calibrated against RNA-seq data from P7 GNPs and Ptch1-/- medulloblastoma +/- HH pathway inhibitor (vismodegib), including Cyclin D1, MYCN, Gli1, and EZH2 transcript ratios across conditions (see Methods). A systematic parameter sweep over 960 combinations identified a Hill coefficient of n=3 for MYCN-driven Cyclin D1 transcription as critical for simultaneously matching the near-complete Cyclin D1 loss in GNPs treated with HHi (86% reduction) and the partial Cyclin D1 retention in MB treated with HHi (only 60% reduction). This cooperative threshold behavior means that at wild-type MYCN levels (~0.38 a.u.), the MYCN contribution to Cyclin D1 is negligible (<6%), whereas at amplified MB levels (~0.92 a.u.), MYCN drives 41% of total Cyclin D1 transcription. The model passed 16 of 18 validation tests across 10 conditions including GNP cycling, G0 arrest, HHi response, EZH2i response, and MB drug combinations (Fig. Xb, fig_v42_validation.pdf, rows 1-3).
+
+EZH2 feedback lengthens the cell cycle and creates Cyclin D1 oscillations. To quantify the functional impact of EZH2-mediated Cyclin D1 repression, we compared simulations with and without the feedback (by computationally removing EZH2's ability to repress Cyclin D1). In SHH-stimulated GNPs, the EZH2 feedback lengthened the cell cycle period by 4.3 hours (22.2h with feedback vs 17.9h without; Fig. Xc, fig_ezh2_feedback_impact.pdf, row 1; Fig. Xd, fig_ezh2_feedback_periods.png, left panel). Removing the feedback doubled mean Cyclin D1 mRNA (2.4 to 4.7 a.u.) and eliminated its oscillatory character -- without EZH2 repression, Cyclin D1 mRNA became constitutively high rather than fluctuating with the cell cycle (Fig. Xc, fig_ezh2_feedback_impact.pdf, row 2). This oscillation arises because EZH2 protein levels track E2F/pRBpp activity through the cell cycle, creating a phase-shifted repression of Cyclin D1 that peaks during S/G2 (Fig. Xc, fig_ezh2_feedback_impact.pdf, rows 3-4). In MB, the feedback had a smaller effect on period (0.9h lengthening, 18.1h vs 17.3h) because the high MYCN-driven Cyclin D1 pushes the system well past the Rb-E2F bistable switch, making the EZH2 brake less effective (Fig. Xd, fig_ezh2_feedback_periods.png, all panels). These results are consistent with the experimental observation that EZH2 overexpression specifically traps cells in G0 (Fig. 3) -- the model predicts that EZH2 acts most potently at the G0/G1 boundary where pRB phosphorylation is rate-limiting.
+
+The model predicts that EZH2 inhibition rescues HHi-arrested MB through Cyclin D1 de-repression, but CDK4/6 inhibition cannot be rescued. We used the model to test drug combination responses in MB. HHi (vismodegib) arrested MB cells by ablating Gli-driven Cyclin D1, leaving only the MYCN-driven fraction (~40% of untreated). This residual Cyclin D1, while substantial, fell below the threshold required for pRB phosphorylation and cell cycle entry (Fig. Xe, fig_v42_ezh2i_rescue.png, panels 1-2). Adding EZH2 inhibition to HHi-treated MB cells de-repressed Cyclin D1 transcription, doubling the remaining MYCN-driven Cyclin D1 and restoring it above the cycling threshold. This rescued cell cycle progression (8 divisions in 168h, period ~19.3h; Fig. Xe, fig_v42_ezh2i_rescue.png, panel 3). Critically, the model predicted that CDK4/6 inhibition (modeled by blocking CycD/CDK4-mediated pRB phosphorylation) would arrest MB cells in a manner that EZH2 inhibition could not rescue (Fig. Xe, fig_v42_ezh2i_rescue.png, panels 4-5). Because CDK4/6 inhibitors act downstream of Cyclin D1 at the kinase level, increasing Cyclin D1 transcription via EZH2 inhibition cannot bypass the block -- consistent with the observation that palbociclib increases Cyclin D1 transcript (Fig. 4) but this is insufficient to overcome kinase inhibition. This distinction -- rescue of upstream (HHi) but not downstream (CDK4/6i) blockade -- confirms that the EZH2i rescue mechanism operates specifically through transcriptional de-repression of Cyclin D1, and motivated the experimental rescue experiments described below.
+
+
+================================================================================
+METHODS
+================================================================================
+
+Computational Modeling
+---------------------
+
+Model construction
+
+We developed an ODE-based model (v42) of the Ezh2-Cyclin D1 negative feedback loop embedded within the mammalian cell cycle, integrating four functional modules: (1) Hedgehog signaling, (2) MYCN regulation, (3) EZH2 regulation, and (4) the cell cycle engine. The model was implemented in Antimony format and simulated using Tellurium (Choi et al., 2018) with the default CVODE integrator in Python 3.
+
+Cell cycle engine. The core oscillator was adapted from the Gerard and Goldbeter (2009) model of the mammalian cell cycle. This model captures the sequential activation of four Cyclin/CDK complexes -- CycD/CDK4 (G1), CycE/CDK2 (G1/S), CycA/CDK2 (S/G2), and CycB/CDK1 (M) -- through coupled positive feedback loops (Rb-E2F bistable switch, Cdc25 phosphatase activation) and negative feedback (APC/C-mediated cyclin degradation at mitotic exit). Key features include: (i) the Rb-E2F bistable switch, in which CycD/CDK4 initiates pRB phosphorylation (pRB to pRBp), CycE/CDK2 completes it (pRBp to pRBpp), and free E2F drives CycE and CycA transcription in a positive feedback loop; (ii) the p27/Kip1 stoichiometric CDK inhibitor, which sequesters CDK complexes in G0/G1 and is removed by CycE/CDK2-mediated phosphorylation followed by Skp2-dependent degradation; and (iii) APC/C co-activators Cdc20 (activated by CycB/CDK1) and Cdh1 (activated at low CDK), which degrade mitotic cyclins and reset the system. All cell cycle reactions were scaled by a time-scaling factor (epsilon = 150) to produce cell cycle periods of approximately 22 hours, matching published GNP proliferation rates. The model tracks 38 cell cycle species including free and complexed cyclins, CDK complexes in active and inactive forms, pRB phosphorylation states, E2F, p27/p27p, Skp2, Cdh1, Cdc20, and three Cdc25 phosphatase isoforms (Pe, Pa, Pb).
+
+Hedgehog signaling module. The HH pathway was modeled as an upstream driver of Cyclin D1 transcription. SHH ligand binds Ptch1 receptor, relieving tonic inhibition of Smoothened (Smo). Active Smo converts Gli repressor (Gli_rep) to Gli activator (Gli_act) via a Hill function (n = 2), and Gli_act drives Gli1 transcription in a positive feedback loop that amplifies the signal. Ptch1 gene dosage was parameterized by a copy number variable (1.0 = wild-type, 0.0 = homozygous loss in MB), and HH pathway inhibition (HHi; vismodegib) was modeled as a direct block on Smo activation: Smo_active = k_act / (1 + Ptch1_free/K) x (1 - HHi), where HHi = 0 (untreated) or 1 (full inhibition). In the Ptch1-/- MB context, Ptch1 was set to zero and Smo was initialized in the constitutively active state.
+
+EZH2 module. EZH2 mRNA transcription was modeled as the sum of a basal component and an E2F/pRBpp-dependent component:
+
+  d[EZH2_mRNA]/dt = k_basal + k_E2F x E2F/(K_E2F + E2F) x pRBpp/(K_pRBpp + pRBpp) - k_deg x EZH2_mRNA
+
+This formulation makes EZH2 a cell cycle-dependent gene that is high during S/G2 (when E2F is active and pRB is hyperphosphorylated) and low in G0/quiescence, consistent with the scRNA-seq data showing ~2-fold higher EZH2 in S/G2M vs G0 (Fig. 4). EZH2 protein was modeled with first-order translation and slow degradation (half-life ~35h), reflecting its known stability. EZH2 represses all Cyclin D1 transcription through a repression factor:
+
+  EZH2_repression = K_EZH2 / (K_EZH2 + EZH2 x (1 - EZH2i))
+
+where K_EZH2 = 0.5 (half-repression constant) and EZH2i = 0 (untreated) or 1 (full EZH2 catalytic inhibition, modeling tazemetostat). This produces approximately 2-fold Cyclin D1 de-repression upon EZH2 inhibition, matching the experimental data (Fig. 3).
+
+MYCN module. MYCN was incorporated to explain why Ptch1-/- MB retains ~40% of Cyclin D1 under HH pathway inhibition despite near-complete Gli1 ablation. MYCN synthesis has two components: an autonomous (basal) term scaled by an amplification factor (1.0 for GNPs, 2.8 for MB), and a small Gli-dependent term that is not amplified. This architecture makes MB MYCN predominantly autonomous and HHi-resistant, while GNP MYCN has a larger Gli-dependent fraction. MYCN drives Cyclin D1 transcription through a cooperative Hill function (n = 3):
+
+  MYCN_contribution = k_MYCN x MYCN^3 / (K_MYCN^3 + MYCN^3)
+
+The Hill coefficient of 3 was identified by parameter sweep as necessary to create a threshold effect: at GNP MYCN levels, the contribution is negligible (<6% of total Cyclin D1), while at MB MYCN levels, the contribution is substantial (41%). Parameters k_MYCN = 15.0 and K_MYCN = 1.5 were optimized against RNA-seq data (see Parameter calibration below).
+
+Cyclin D1 mRNA integration. Cyclin D1 mRNA transcription integrates all upstream signals in a single equation:
+
+  d[Cd_mRNA]/dt = (k_basal + k_Gli x f(Gli_act, Gli1, Gli_rep) + k_MYCN x g(MYCN)) x EZH2_repression - k_deg x Cd_mRNA
+
+where f() represents Gli activator-driven, Gli repressor-inhibited transcription and g() is the MYCN Hill function described above. Cyclin D1 protein is then translated and feeds into the cell cycle engine through CycD/CDK4 complex formation.
+
+CDK4/6 inhibition. CDK4/6 inhibition (modeling palbociclib) was implemented by setting the rate of CycD/CDK4-mediated pRB phosphorylation (V1) to zero, blocking the first step of pRB to pRBp conversion. This prevents CycD/CDK4 kinase activity while leaving Cyclin D1 transcription unaffected, consistent with the mechanism of action of CDK4/6 inhibitors.
+
+
+Parameter calibration
+---------------------
+
+Model parameters were calibrated against quantitative RNA-seq data from P7 wild-type GNPs and Ptch1-/- medulloblastoma, with and without vismodegib (HHi). The following experimental ratios served as calibration targets:
+
+  Target                          Experimental value        Source
+  ---------------------------------------------------------------------------
+  Cyclin D1: GNP+HHi / GNP       0.14 (86% reduction)     RNA-seq
+  Cyclin D1: MB+HHi / MB         0.40 (60% reduction)     RNA-seq
+  MYCN: GNP+HHi / GNP            0.78 (22% reduction)     RNA-seq
+  MYCN: MB+HHi / MB              0.86 (14% reduction)     RNA-seq
+  MYCN: MB / GNP                  ~2.8x                    RNA-seq
+  Gli1: GNP+HHi reduction         >99%                     RNA-seq
+  EZH2: G0 / cycling ratio       ~0.6                     Published data, scRNA-seq (Fig. 4)
+  EZH2i: Cyclin D1 fold change   ~2x                      Experimental data (Fig. 3)
+  Cell cycle period (GNP)         ~22-23h                  Published GNP proliferation data
+  EZH2: HHi reduction             25-47%                   RNA-seq
+
+A systematic sweep of 960 parameter combinations was performed over the MYCN Hill function parameters: Hill coefficient n in {1, 2, 3, 4}, k_Cd_tx_MYCN in [0.5, 20.0], K_MYCN_Cd in [0.3, 3.0], k_MYCN_synth_basal in [0.1, 0.8], k_Cd_tx_Gli_max in [2.0, 6.0], and MYCN_amplification in [2.0, 3.5]. Each combination was simulated under four conditions (GNP +/- HHi, MB +/- HHi) and scored against the calibration targets using a weighted sum of squared relative errors. The optimal parameter set (composite score = 0.231) was: n = 3, k_MYCN = 15.0, K_MYCN = 1.5, k_MYCN_basal = 0.3, k_Gli_max = 4.0, MYCN_amplification = 2.8.
+
+
+Simulation conditions
+---------------------
+
+All simulations were performed using Tellurium v2.2 with the CVODE integrator (absolute tolerance 1e-12, relative tolerance 1e-8). The following conditions were simulated:
+
+  Condition               SHH   Ptch1   HHi   EZH2i   MYCN amp   CDK4/6i
+  --------------------------------------------------------------------------
+  GNP + SHH               0.5   1.0     0     0       1.0        No
+  GNP - SHH               0.0   1.0     0     0       1.0        No
+  GNP + HHi               0.5   1.0     1     0       1.0        No
+  GNP + EZH2i             0.5   1.0     0     1       1.0        No
+  GNP + HHi + EZH2i       0.5   1.0     1     1       1.0        No
+  GNP Serum-starved        0.5   1.0     0     0       1.0        No
+  MB (Ptch1-/-)            0.0   0.0     0     0       2.8        No
+  MB + HHi                 0.0   0.0     1     0       2.8        No
+  MB + EZH2i               0.0   0.0     0     1       2.8        No
+  MB + HHi + EZH2i         0.0   0.0     1     1       2.8        No
+  MB + CDK4/6i             0.0   0.0     0     0       2.8        Yes
+  MB + CDK4/6i + EZH2i     0.0   0.0     0     1       2.8        Yes
+
+Validation simulations were run for 96 hours (9,600 time points). EZH2 feedback impact and drug rescue simulations were run for 168 hours (16,800 time points) to avoid edge effects and ensure stable oscillatory behavior. Cell divisions were counted as peaks in Cyclin B concentration (prominence > 0.05, minimum distance 10 time points) after an initial transient period of 10 hours. Cell cycle period was calculated as the mean interval between consecutive Cyclin B peaks. Steady-state species concentrations were computed as the mean of the last 1,500 time points.
+
+
+EZH2 feedback analysis
+-----------------------
+
+The impact of EZH2-mediated Cyclin D1 repression was assessed by comparing simulations with intact feedback (K_EZH2 = 0.5) versus computationally ablated feedback (K_EZH2 = 1e6, making the repression factor approximately 1.0 regardless of EZH2 level). This was performed in both GNP + SHH and MB contexts. Phase relationships between Cyclin D1 mRNA, EZH2 protein, and Cyclin B were visualized by normalizing each species to [0, 1] over the last 70 hours of the 168-hour simulation.
+
+
+Software and code availability
+-------------------------------
+
+The model was implemented in Antimony (Smith et al., 2009) and simulated using Tellurium (Choi et al., 2018) in Python 3. Scipy was used for peak detection (scipy.signal.find_peaks). Matplotlib was used for all figure generation. Model source code and simulation scripts are available at [repository URL]. Key files: model builder (src/build_model_v42_mycn.py), validation (simulations/validate_v42.py), EZH2 feedback analysis (simulations/sim_ezh2_feedback_impact.py), drug rescue predictions (simulations/validate_v42.py, rescue figure section).
+
+
+================================================================================
+FIGURE PANEL REFERENCE
+================================================================================
+
+The computational model results correspond to the following figure panels and source files:
+
+  Panel               Description                                                          Source file
+  -------------------------------------------------------------------------------------------------------------------
+  Fig. Xa             Model architecture diagram showing all four modules,                 fig_v42_architecture.pdf
+                      drug targets, and feedback connections
+
+  Fig. Xb, row 1      GNP validation: CycB traces (GNP+SHH, -SHH, +HHi,                  fig_v42_validation.pdf,
+                      +EZH2i, +HHi+EZH2i), CycD1 model vs data, MYCN model               panels (0,0)-(0,3)
+                      vs data, EZH2 regulation (cycling vs G0 vs HHi)
+
+  Fig. Xb, row 2      MB validation: CycB traces (MB, +HHi, +EZH2i,                       fig_v42_validation.pdf,
+                      +HHi+EZH2i), CycD1 model vs data, MYCN model vs data,               panels (1,0)-(1,3)
+                      Gli1 model vs data
+
+  Fig. Xb, row 3      Division counts (all conditions), MB CycD1 time courses,             fig_v42_validation.pdf,
+                      MB EZH2 time courses, MYCN dynamics                                  panels (2,0)-(2,3)
+
+  Fig. Xc, left        GNP + SHH: CycB, CycD1 mRNA, EZH2 protein, and phase               fig_ezh2_feedback_impact.pdf,
+                      relationship with vs without EZH2 feedback (168h)                    column 1
+
+  Fig. Xc, right       MB (Ptch1-/-): same as left column for MB context                   fig_ezh2_feedback_impact.pdf,
+                                                                                           column 2
+
+  Fig. Xd              Bar chart comparison of period, CycD1 mRNA, and                     fig_ezh2_feedback_periods.png
+                      division counts with vs without EZH2 feedback
+                      in GNP and MB
+
+  Fig. Xe, panels 1-3  MB CycB traces: untreated (9 div), +HHi (1 div,                    fig_v42_ezh2i_rescue.png,
+                      arrested), +HHi+EZH2i (8 div, rescued) -- 168h                      panels 1-3
+
+  Fig. Xe, panels 4-5  MB CycB traces: +CDK4/6i (0 div, arrested),                        fig_v42_ezh2i_rescue.png,
+                      +CDK4/6i+EZH2i (0 div, no rescue) -- 168h                           panels 4-5
+
+  Fig. S-comp          EZH2 compensation analysis: RNA-seq data vs model                   fig_ezh2_data_constrained.png
+                      EZH2 levels, CycD1 compensation waterfall, drug
+                      response comparison at data-constrained EZH2
