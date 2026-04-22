@@ -8,8 +8,8 @@ Tests:
 
 This quantifies how much the EZH2→CycD1 repression buffers MYCN's proliferative drive.
 """
-import sys
-sys.path.insert(0, '/Users/jpurzner/Dropbox/Q_research/py_projects/ezh2_cyclind1_sym')
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import tellurium as te
 import numpy as np
 import matplotlib.pyplot as plt

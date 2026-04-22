@@ -10,8 +10,8 @@ Solution: Hill coefficient n>=2 for MYCN->CycD1 creates threshold behavior.
 
 Sweeps: n_MYCN_Cd, k_Cd_tx_MYCN, K_MYCN_Cd, MYCN_amplification_MB, k_Cd_tx_Gli_max
 """
-import sys
-sys.path.insert(0, '/Users/jpurzner/Dropbox/Q_research/py_projects/ezh2_cyclind1_sym')
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import tellurium as te
 import numpy as np
 from scipy.signal import find_peaks

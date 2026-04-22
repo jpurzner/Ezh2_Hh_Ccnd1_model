@@ -11,8 +11,8 @@ Gap: 1.77/1.13 = 1.57x unexplained.
 Test: What's the impact of data-level EZH2 on CycD1 and cell cycle in MB?
 Should we add MYCN→EZH2 transcription to close the gap?
 """
-import sys
-sys.path.insert(0, '/Users/jpurzner/Dropbox/Q_research/py_projects/ezh2_cyclind1_sym')
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import tellurium as te
 import numpy as np
 import matplotlib.pyplot as plt

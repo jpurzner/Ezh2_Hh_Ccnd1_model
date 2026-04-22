@@ -54,12 +54,30 @@ simulations/
 
 ```bash
 pip install -r requirements.txt
-python src/build_model_v42_mycn.py
-python simulations/validate_v42.py
-python simulations/sim_ezh2_feedback_impact.py
 ```
 
 Use system `python3` (tellurium can be fragile inside some virtualenvs).
+
+## Reproducing the figures
+
+All scripts must be run **from the repository root** (they use relative paths for the output figures and resolve the `src/` module with `os.path.dirname(__file__)`). Each script regenerates its figures in-place under `simulations/`.
+
+| Figure(s) | Script | Approx. runtime |
+|-----------|--------|-----------------|
+| `fig_v42_architecture.png/pdf` | `python simulations/fig_v42_architecture.py` | <10 s (schematic, no simulation) |
+| `fig_v42_validation.png/pdf`, `fig_v42_cycb_traces.png`, `fig_v42_ezh2i_rescue.png`, `validation_v42_results.json` | `python simulations/validate_v42.py` | ~3–5 min (10 conditions × 96 h + 5-condition 168 h rescue panel) |
+| `fig_ezh2_feedback_impact.png/pdf`, `fig_ezh2_feedback_periods.png` | `python simulations/sim_ezh2_feedback_impact.py` | ~2 min (4 × 168 h simulations) |
+| `fig_ezh2_compensation.png/pdf` | `python simulations/sim_ezh2_compensation.py` | ~2 min |
+| `fig_ezh2_data_constrained.png/pdf` | `python simulations/sim_ezh2_data_constrained.py` | ~5 min |
+| `sweep_mycn_hill_results.json` (parameter calibration) | `python simulations/sweep_mycn_hill.py` | ~30–60 min (960 parameter combinations) |
+
+The model itself can be printed/inspected with:
+
+```bash
+python src/build_model_v42_mycn.py
+```
+
+All simulations use the CVODE stiff integrator via tellurium/roadrunner (default). Because the ODEs are deterministic and CVODE is stable, re-running should produce results numerically identical to the checked-in figures modulo tellurium/roadrunner version differences.
 
 ## Drug implementations
 
